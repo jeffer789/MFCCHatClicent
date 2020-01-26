@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFCCHatClicent", "MFCCHatClicent.vcxproj", "{78967848-6C2D-45DD-BB14-35F987FB5AEE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFCChatServer", "..\MFCChatServer\MFCChatServer.vcxproj", "{3940C1A4-0D9B-47CA-92C5-74A78875F938}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFCChatServer", "MFCChatServer\MFCChatServer.vcxproj", "{3940C1A4-0D9B-47CA-92C5-74A78875F938}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
