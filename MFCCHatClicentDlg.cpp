@@ -59,6 +59,8 @@ CMFCCHatClicentDlg::CMFCCHatClicentDlg(CWnd* pParent /*=nullptr*/)
 void CMFCCHatClicentDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST1, m_list);
+	DDX_Control(pDX, IDC_SENDMSG_EDIT, m_input);
 }
 
 BEGIN_MESSAGE_MAP(CMFCCHatClicentDlg, CDialogEx)
@@ -101,6 +103,8 @@ BOOL CMFCCHatClicentDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
+	GetDlgItem(IDC_PORT_EDIT)->SetWindowText(_T("5000"));
+	GetDlgItem(IDC_IPADDRESS)->SetWindowText(_T("127.0.0.1"));
 
 	// TODO: 在此添加额外的初始化代码
 
@@ -160,13 +164,32 @@ HCURSOR CMFCCHatClicentDlg::OnQueryDragIcon()
 
 void CMFCCHatClicentDlg::OnBnClickedConnectBin()
 {
+	//把IP与端口拿到
 	TRACE("[Charcli]connect btm");//使用TRACH调试
-	MessageBox(L"connect btm");
+	CString strPort, strIP;
+	//从控件里面获取内容
+	GetDlgItem(IDC_PORT_EDIT)->GetWindowText(strPort);
+	GetDlgItem(IDC_IPADDRESS)->GetWindowText(strIP);
+
+	//cstring转char*使用一个宏
+	USES_CONVERSION;
+	LPCSTR szPont = (LPCSTR)T2A(strPort);
+	LPCSTR szIP = (LPCSTR)T2A(strIP);
+	TRACE("szPort-%s,szIP-%s", szPont, szIP);
+
+	int iPort = _ttoi(strPort);
+	//创建一个socket对象
+	m_client = new CMySocket;
+	//创建套接字
+	m_client->Create();
+
+	//链接
+	m_client->Connect(strIP,iPort);
 }
 //111
 
 
 void CMFCCHatClicentDlg::OnBnClickedDisconnectBin()
 {
-	// TODO: 在此添加控件通知处理程序代码
+
 }

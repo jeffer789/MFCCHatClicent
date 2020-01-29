@@ -59,12 +59,14 @@ CMFCChatServerDlg::CMFCChatServerDlg(CWnd* pParent /*=nullptr*/)
 void CMFCChatServerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_MOSG_LIST, m_list);
 }
 
 BEGIN_MESSAGE_MAP(CMFCChatServerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_STATAT_BUTTON, &CMFCChatServerDlg::OnBnClickedStatatButton)
 END_MESSAGE_MAP()
 
 
@@ -98,6 +100,7 @@ BOOL CMFCChatServerDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
+	GetDlgItem(IDC_POND_EDIT)->SetWindowText(_T("5000"));
 
 	// TODO: 在此添加额外的初始化代码
 
@@ -153,3 +156,25 @@ HCURSOR CMFCChatServerDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CMFCChatServerDlg::OnBnClickedStatatButton()
+{
+	TRACE("####OnBnClickedStatatButton");
+	CString strPort, strIP;
+	//从控件里面获取内容
+	GetDlgItem(IDC_POND_EDIT)->GetWindowText(strPort);
+
+	//cstring转char*使用一个宏
+	USES_CONVERSION;
+	LPCSTR szPont = (LPCSTR)T2A(strPort);
+	TRACE("szPort=%s", szPont);
+	
+	int iport = _ttoi(strPort);
+
+	m_server = new CSererSocket;
+
+	m_server->Create(iport);
+
+	m_server->Listen();
+}

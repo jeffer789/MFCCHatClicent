@@ -3,7 +3,7 @@
 //
 
 #pragma once
-
+#include "CSererSocket.h"
 
 // CMFCChatServerDlg 对话框
 class CMFCChatServerDlg : public CDialogEx
@@ -31,4 +31,8 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedStatatButton();
+	CListBox m_list;
+	CSererSocket* m_server;
 };
