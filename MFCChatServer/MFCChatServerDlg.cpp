@@ -67,6 +67,7 @@ BEGIN_MESSAGE_MAP(CMFCChatServerDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_STATAT_BUTTON, &CMFCChatServerDlg::OnBnClickedStatatButton)
+	ON_BN_CLICKED(IDC_SENT_BTN, &CMFCChatServerDlg::OnBnClickedSentBtn)
 END_MESSAGE_MAP()
 
 
@@ -174,7 +175,80 @@ void CMFCChatServerDlg::OnBnClickedStatatButton()
 
 	m_server = new CSererSocket;
 
-	m_server->Create(iport);
+	if (!m_server->Create(iport))
+	{
+		TRACE("m_server create error =%d", GetLastError());//查找错误码getlasterror是获取错误码
+		return;
+	}
 
-	m_server->Listen();
+	if (!m_server->Listen())
+	{
+		TRACE("m_server Listen error =%d", GetLastError());//查找错误码getlasterror是获取错误码
+		return;
+	}
+
+	/*CString str;
+	m_tm = CTime::GetCurrentTime();
+	str=m_tm.Format("%X ");
+	TRACE("调试");
+	str += _T("建立服务");*/
+
+	CString strShow;
+	CString strInfo = _T("");
+	CString strMsg = _T("建立服务");
+
+	strShow = CatShowString(strInfo, strMsg);
+
+	m_list.AddString(strShow);
+	UpdateData(FALSE);//false是数据复制下来，true是数据往控件送
+
+}
+CString CMFCChatServerDlg::CatShowString(CString strInfo, CString strMsg)
+{
+	//时间+信息（昵称+消息）
+	CString strTime;
+	CTime tmNow;
+	tmNow = CTime::GetCurrentTime();
+	strTime = tmNow.Format("%X");
+	CString strShow;
+	strShow = strTime + strShow;
+	strShow += strInfo;
+	strShow += strMsg;
+	return strShow;
+}
+
+void CMFCChatServerDlg::OnBnClickedSentBtn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	//1.获取编辑框内容
+	CString strTmpMsg;
+	GetDlgItem(IDC_SENT_EDIT)->GetWindowTextW(strTmpMsg);
+
+
+	USES_CONVERSION;
+	char* szSendbuff = T2A(strTmpMsg);
+
+	//2发送个客服端
+	m_chat->Send(szSendbuff, SEND_MAX_BUFF, 0);
+
+	//3显示到列表框
+	/*CString strShow = _T("服务端: ");
+	CString strTime;
+	m_tm = CTime::GetCurrentTime();
+	strTime = m_tm.Format("%X");
+
+	strShow = strTime + _T(":") + strShow;
+	strShow += strTmpMsg;*/
+
+	CString strShow;
+	CString strInfo = _T("服务端: ");
+	//CString strMsg = _T("建立服务");
+
+	strShow = CatShowString(strInfo, strTmpMsg);
+
+	m_list.AddString(strShow);
+	UpdateData(FALSE);
+
+	//清空编辑框
+	GetDlgItem(IDC_SENT_EDIT)->SetWindowTextW(_T(""));
 }

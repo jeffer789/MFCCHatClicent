@@ -38,6 +38,8 @@ public:
 	CMySocket* m_client;
 	//添加的部分
 	CListBox m_list;
-	CTime m_tm;
+	//CTime m_tm;
 	CEdit m_input;//
+	afx_msg void OnBnClickedSentBtn();
+	CString CMFCCHatClicentDlg::CatShowString(CString strInfo,CString strMsg);
 };

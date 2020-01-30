@@ -4,6 +4,7 @@
 
 #pragma once
 #include "CSererSocket.h"
+#include "CChatSocket.h"
 
 // CMFCChatServerDlg 对话框
 class CMFCChatServerDlg : public CDialogEx
@@ -34,5 +35,9 @@ protected:
 public:
 	afx_msg void OnBnClickedStatatButton();
 	CListBox m_list;
+	CChatSocket* m_chat;
 	CSererSocket* m_server;
+	//CTime m_tm;
+	afx_msg void OnBnClickedSentBtn();
+	CString CMFCChatServerDlg::CatShowString(CString strInfo, CString strMsg);
 };

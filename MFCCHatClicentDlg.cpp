@@ -69,6 +69,7 @@ BEGIN_MESSAGE_MAP(CMFCCHatClicentDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_CONNECT_BIN, &CMFCCHatClicentDlg::OnBnClickedConnectBin)
 	ON_BN_CLICKED(IDC_DISCONNECT_BIN, &CMFCCHatClicentDlg::OnBnClickedDisconnectBin)
+	ON_BN_CLICKED(IDC_SENT_BTN, &CMFCCHatClicentDlg::OnBnClickedSentBtn)
 END_MESSAGE_MAP()
 //函数表
 
@@ -180,16 +181,74 @@ void CMFCCHatClicentDlg::OnBnClickedConnectBin()
 	int iPort = _ttoi(strPort);
 	//创建一个socket对象
 	m_client = new CMySocket;
-	//创建套接字
-	m_client->Create();
+	//创建套接字 容错
+	if (!m_client->Create())
+	{
+		TRACE("m_client create error %d", GetLastError());//查找错误码getlasterror是获取错误码
+		return;
+	}
+	/*else
+	{
+		TRACE("m_client create success");
+	}*/
+	//m_client->Create();
 
 	//链接
-	m_client->Connect(strIP,iPort);
+	if (m_client->Connect(strIP, iPort)!=SOCKET_ERROR)
+	{
+		TRACE("m_client Connect error %d", GetLastError());//查找错误码getlasterror是获取错误码
+		return;
+	}
 }
 //111
 
 
-void CMFCCHatClicentDlg::OnBnClickedDisconnectBin()
+void CMFCCHatClicentDlg::OnBnClickedDisconnectBin()//断开按键
 {
 
+}
+
+
+
+CString CMFCCHatClicentDlg::CatShowString(CString strInfo, CString strMsg)
+{
+	//时间+信息（昵称+消息）
+	CString strTime;
+	CTime tmNow;
+	tmNow = CTime::GetCurrentTime();
+	strTime = tmNow.Format("%X");
+	CString strShow;
+	strShow = strTime + strShow;
+	strShow += strInfo;
+	strShow += strMsg;
+	return strShow;
+}
+
+
+
+void CMFCCHatClicentDlg::OnBnClickedSentBtn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	//1.获取编辑框内容
+	CString strTmpMsg;
+	GetDlgItem(IDC_SENDMSG_EDIT)->GetWindowTextW(strTmpMsg);
+
+
+	USES_CONVERSION;
+	char* szSendbuff = T2A(strTmpMsg);
+
+	//2发送个客服端
+	m_client->Send(szSendbuff,SEND_MAX_BUFF,0);
+
+	//3显示到列表框
+	CString strShow;
+	CString strInfo = _T("我: ");
+	//CString strMsg = _T("");
+
+	strShow=CatShowString(strInfo, strTmpMsg);
+	m_list.AddString(strShow);
+	UpdateData(FALSE);
+
+	//清空编辑框
+	GetDlgItem(IDC_SENDMSG_EDIT)->SetWindowTextW(_T(""));
 }
