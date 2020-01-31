@@ -34,7 +34,7 @@ void CChatSocket::OnReceive(int nErrorCode)
 	strShow += strRecvMsg;*/
 
 	CString strShow;
-	CString strInfo = _T("客户端: ");
+	CString strInfo = _T("");
 	//CString strMsg = _T("建立服务");
 
 	strShow = dlg->CatShowString(strInfo, strRecvMsg);

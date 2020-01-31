@@ -70,6 +70,7 @@ BEGIN_MESSAGE_MAP(CMFCCHatClicentDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CONNECT_BIN, &CMFCCHatClicentDlg::OnBnClickedConnectBin)
 	ON_BN_CLICKED(IDC_DISCONNECT_BIN, &CMFCCHatClicentDlg::OnBnClickedDisconnectBin)
 	ON_BN_CLICKED(IDC_SENT_BTN, &CMFCCHatClicentDlg::OnBnClickedSentBtn)
+	ON_BN_CLICKED(IDC_SVAENAME_BIN, &CMFCCHatClicentDlg::OnBnClickedSvaenameBin)
 END_MESSAGE_MAP()
 //函数表
 
@@ -106,6 +107,39 @@ BOOL CMFCCHatClicentDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 	GetDlgItem(IDC_PORT_EDIT)->SetWindowText(_T("5000"));
 	GetDlgItem(IDC_IPADDRESS)->SetWindowText(_T("127.0.0.1"));
+
+	WCHAR wszName[MAX_PATH] = { 0 };
+	WCHAR strPath[MAX_PATH] = { 0 };
+	//获取当前路径
+	GetCurrentDirectoryW(MAX_PATH, strPath);
+	//TRACE("####strPath =%ls", strPath);//没有打印出来
+	TRACE("####开始=%ls", strPath);
+
+
+	//TRACE("strPath =%ls", strPath);
+	//TRACE("####1");
+	CString strFilePath;
+	strFilePath.Format(L"%ls//Test.ini", strPath);
+
+	//WritePrivateProfileString(_T("CLIEXT"), _T("NAME"), strName, strFilePath);
+
+	DWORD dwNum=GetPrivateProfileStringW(_T("CLIEXT"), _T("NAME"), NULL, wszName, MAX_PATH,strFilePath);
+	if (dwNum>0)
+	{
+		SetDlgItemText(IDC_NAME_EDIT, wszName);
+		UpdateData(FALSE);
+	}
+	else
+	{
+		WritePrivateProfileString(_T("CLIEXT"), _T("NAME"),L"客户端", strFilePath);
+		SetDlgItemText(IDC_NAME_EDIT, L"客户端");
+		UpdateData(FALSE);
+	}
+
+// 	TRACE("####wszName=%ls",wszName);//可以打印
+// 	TRACE("####开始=%ls",strPath);//不可以打印
+	//SetDlgItemText(IDC_NAME_EDIT, wszName);
+	//UpdateData(FALSE);
 
 	// TODO: 在此添加额外的初始化代码
 
@@ -166,7 +200,7 @@ HCURSOR CMFCCHatClicentDlg::OnQueryDragIcon()
 void CMFCCHatClicentDlg::OnBnClickedConnectBin()
 {
 	//把IP与端口拿到
-	TRACE("[Charcli]connect btm");//使用TRACH调试
+	TRACE("####[Charcli]connect btm");//使用TRACH调试
 	CString strPort, strIP;
 	//从控件里面获取内容
 	GetDlgItem(IDC_PORT_EDIT)->GetWindowText(strPort);
@@ -176,7 +210,7 @@ void CMFCCHatClicentDlg::OnBnClickedConnectBin()
 	USES_CONVERSION;
 	LPCSTR szPont = (LPCSTR)T2A(strPort);
 	LPCSTR szIP = (LPCSTR)T2A(strIP);
-	TRACE("szPort-%s,szIP-%s", szPont, szIP);
+	TRACE("####szPort-%s,szIP-%s", szPont, szIP);
 
 	int iPort = _ttoi(strPort);
 	//创建一个socket对象
@@ -184,7 +218,7 @@ void CMFCCHatClicentDlg::OnBnClickedConnectBin()
 	//创建套接字 容错
 	if (!m_client->Create())
 	{
-		TRACE("m_client create error %d", GetLastError());//查找错误码getlasterror是获取错误码
+		TRACE("#####m_client create error %d", GetLastError());//查找错误码getlasterror是获取错误码
 		return;
 	}
 	/*else
@@ -196,7 +230,7 @@ void CMFCCHatClicentDlg::OnBnClickedConnectBin()
 	//链接
 	if (m_client->Connect(strIP, iPort)!=SOCKET_ERROR)
 	{
-		TRACE("m_client Connect error %d", GetLastError());//查找错误码getlasterror是获取错误码
+		TRACE("######m_client Connect error %d", GetLastError());//查找错误码getlasterror是获取错误码
 		return;
 	}
 }
@@ -233,6 +267,11 @@ void CMFCCHatClicentDlg::OnBnClickedSentBtn()
 	CString strTmpMsg;
 	GetDlgItem(IDC_SENDMSG_EDIT)->GetWindowTextW(strTmpMsg);
 
+	CString strName;
+	//strInfo += _T("：");
+	GetDlgItem(IDC_NAME_EDIT)->GetWindowTextW(strName);
+
+	strTmpMsg = strName + _T("：") + strTmpMsg;
 
 	USES_CONVERSION;
 	char* szSendbuff = T2A(strTmpMsg);
@@ -242,7 +281,11 @@ void CMFCCHatClicentDlg::OnBnClickedSentBtn()
 
 	//3显示到列表框
 	CString strShow;
-	CString strInfo = _T("我: ");
+ 	CString strInfo;
+	strInfo = _T("");
+// 	GetDlgItem(IDC_NAME_EDIT)->GetWindowTextW(strInfo);
+	//TRACE("####strInfo=%ls", strInfo);
+	//CString strInfo = _T("我: ");
 	//CString strMsg = _T("");
 
 	strShow=CatShowString(strInfo, strTmpMsg);
@@ -251,4 +294,37 @@ void CMFCCHatClicentDlg::OnBnClickedSentBtn()
 
 	//清空编辑框
 	GetDlgItem(IDC_SENDMSG_EDIT)->SetWindowTextW(_T(""));
+}
+
+
+void CMFCCHatClicentDlg::OnBnClickedSvaenameBin()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	//保存昵称
+	//怎么使用配置文件
+	CString strName;
+	GetDlgItemText(IDC_NAME_EDIT, strName);
+	if (strName.GetLength()<=0)
+	{
+		MessageBox(_T("昵称不能为空"));
+		return;
+	}
+	if (IDOK==AfxMessageBox(_T("要修改昵称吗？"),MB_OKCANCEL))
+	{
+		TRACE("####开始");
+		//CString strName;
+		WCHAR strPath[MAX_PATH] = { 0 };
+		//获取当前路径
+		GetCurrentDirectoryW(MAX_PATH, strPath);
+		TRACE("####strPath =%ls", strPath);//没有打印出来
+		//TRACE("strPath =%ls", strPath);
+		//TRACE("####1");
+		CString strFilePath;
+		strFilePath.Format(L"%ls//Test.ini", strPath);
+
+		//GetDlgItemText(IDC_NAME_EDIT, strName);
+
+		WritePrivateProfileStringW(_T("CLIEXT"), _T("NAME"), strName, strFilePath);
+	}
+	
 }

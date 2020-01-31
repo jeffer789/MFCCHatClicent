@@ -42,4 +42,5 @@ public:
 	CEdit m_input;//
 	afx_msg void OnBnClickedSentBtn();
 	CString CMFCCHatClicentDlg::CatShowString(CString strInfo,CString strMsg);
+	afx_msg void OnBnClickedSvaenameBin();
 };

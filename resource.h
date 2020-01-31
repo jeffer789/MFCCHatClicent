@@ -19,6 +19,9 @@
 #define IDC_AUTOSENT_RADIO              1009
 #define IDC_IPADDRESS1                  1010
 #define IDC_IPADDRESS                   1010
+#define IDC_NAME_EDIT                   1011
+#define IDC_CONNECT_BIN2                1012
+#define IDC_SVAENAME_BIN                1012
 
 // Next default values for new objects
 // 
