@@ -65,5 +65,11 @@
     <Image Include="res\MFCCHatClicent.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\守望屁股.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\守望屁股.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

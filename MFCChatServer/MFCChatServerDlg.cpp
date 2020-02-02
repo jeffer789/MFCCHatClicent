@@ -60,6 +60,7 @@ void CMFCChatServerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_MOSG_LIST, m_list);
+	DDX_Control(pDX, IDC_COLOER_COMBO, m_WordColoerCombo);
 }
 
 BEGIN_MESSAGE_MAP(CMFCChatServerDlg, CDialogEx)
@@ -68,6 +69,13 @@ BEGIN_MESSAGE_MAP(CMFCChatServerDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_STATAT_BUTTON, &CMFCChatServerDlg::OnBnClickedStatatButton)
 	ON_BN_CLICKED(IDC_SENT_BTN, &CMFCChatServerDlg::OnBnClickedSentBtn)
+	ON_BN_CLICKED(IDC_CLEARMSG_BTN, &CMFCChatServerDlg::OnBnClickedClearmsgBtn)
+	ON_BN_CLICKED(IDC_STOP_BUTTON, &CMFCChatServerDlg::OnBnClickedStopButton)
+	ON_WM_CTLCOLOR()
+	ON_BN_CLICKED(IDC_CAL_BUTTON, &CMFCChatServerDlg::OnBnClickedCalButton)
+	ON_BN_CLICKED(IDC_MAIL_BUTTON, &CMFCChatServerDlg::OnBnClickedMailButton)
+	ON_BN_CLICKED(IDC_QQ_BUTTON, &CMFCChatServerDlg::OnBnClickedQqButton)
+	ON_BN_CLICKED(IDC_BAIDU_BUTTON, &CMFCChatServerDlg::OnBnClickedBaiduButton)
 END_MESSAGE_MAP()
 
 
@@ -104,6 +112,21 @@ BOOL CMFCChatServerDlg::OnInitDialog()
 	GetDlgItem(IDC_POND_EDIT)->SetWindowText(_T("5000"));
 
 	// TODO: 在此添加额外的初始化代码
+
+	//初始化控件
+	GetDlgItem(IDC_SENT_BTN)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STOP_BUTTON)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATAT_BUTTON)->EnableWindow(TRUE);
+	GetDlgItem(IDC_COLOER_COMBO)->EnableWindow(FALSE);
+	//GetDlgItem(IDC_AUTOSENT_CHECK)->EnableWindow(FALSE);
+
+	m_WordColoerCombo.AddString(_T("黑色"));
+	m_WordColoerCombo.AddString(_T("红色"));
+	m_WordColoerCombo.AddString(_T("蓝色"));
+	m_WordColoerCombo.AddString(_T("绿色"));
+
+	SetDlgItemText(IDC_COLOER_COMBO, _T("黑色"));
+
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -146,6 +169,33 @@ void CMFCChatServerDlg::OnPaint()
 	}
 	else
 	{
+		//定义目的区域 2.加载资源资源图片
+		//1.定义DC
+		CPaintDC dc(this); // 用于绘制的设备上下文
+		//2.确定绘制的区域
+		CRect rect;
+		GetClientRect(&rect);
+		TRACE("width=%d,he=%d",rect.Width(),rect.Height());
+
+		//3.定义并创建一个内存环境，创建兼容性DC
+		CDC dcBmp;
+		dcBmp.CreateCompatibleDC(&dcBmp);
+
+		//4.加载位图
+		CBitmap bmpBackGroud;
+		bmpBackGroud.LoadBitmapW(IDB_BEIJING_BITMAP);
+
+		//5.将图片载入位图里面，bBitmap位图
+		BITMAP bBitMap;
+		bmpBackGroud.GetBitmap(&bBitMap);
+
+		//6.将位图选入临时的内存环境中
+		CBitmap* pbmpOld = dcBmp.SelectObject(&bmpBackGroud);
+
+		//7.绘制图标
+		dc.StretchBlt(0,0,rect.Width(),rect.Height(),&dcBmp,0,0,bBitMap.bmWidth,bBitMap.bmHeight
+		              ,SRCCOPY);
+
 		CDialogEx::OnPaint();
 	}
 }
@@ -161,6 +211,13 @@ HCURSOR CMFCChatServerDlg::OnQueryDragIcon()
 
 void CMFCChatServerDlg::OnBnClickedStatatButton()
 {
+
+	GetDlgItem(IDC_SENT_BTN)->EnableWindow(TRUE);
+	GetDlgItem(IDC_STOP_BUTTON)->EnableWindow(TRUE);
+	GetDlgItem(IDC_STATAT_BUTTON)->EnableWindow(FALSE);
+	GetDlgItem(IDC_COLOER_COMBO)->EnableWindow(TRUE);
+
+
 	TRACE("####OnBnClickedStatatButton");
 	CString strPort, strIP;
 	//从控件里面获取内容
@@ -251,4 +308,111 @@ void CMFCChatServerDlg::OnBnClickedSentBtn()
 
 	//清空编辑框
 	GetDlgItem(IDC_SENT_EDIT)->SetWindowTextW(_T(""));
+}
+
+
+void CMFCChatServerDlg::OnBnClickedClearmsgBtn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_list.ResetContent();
+}
+
+
+void CMFCChatServerDlg::OnBnClickedStopButton()
+{
+	GetDlgItem(IDC_SENT_BTN)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STOP_BUTTON)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATAT_BUTTON)->EnableWindow(TRUE);
+	GetDlgItem(IDC_COLOER_COMBO)->EnableWindow(FALSE);
+
+	m_server->Close();
+	if (m_server != NULL)
+	{
+		delete m_server;
+		m_server = NULL;
+	}
+
+	//m_chat->Close();
+	if (m_chat != NULL)
+	{
+		delete m_chat;
+		m_chat = NULL;
+	}
+	//3显示列表框
+
+	CString strShow;
+	strShow = CatShowString(_T(""), _T("断开连接"));
+	m_list.AddString(strShow);
+	UpdateData(FALSE);
+
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+
+
+HBRUSH CMFCChatServerDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// TODO:  在此更改 DC 的任何特性
+
+	// TODO:  如果默认的不是所需画笔，则返回另一个画笔
+	CString strColor;
+	m_WordColoerCombo.GetWindowTextW(strColor);
+	// 	switch (switch_on)
+	// 	{
+	// 	default:
+		//	break;
+	// 	}
+	if (IDC_MOSG_LIST == pWnd->GetDlgCtrlID() || IDC_SENT_EDIT == pWnd->GetDlgCtrlID())
+	{
+		if (strColor == L"黑色")
+		{
+			pDC->SetTextColor(RGB(0, 0, 0));
+		}
+		if (strColor == L"红色")
+		{
+			pDC->SetTextColor(RGB(255, 0, 0));
+		}
+		if (strColor == L"蓝色")
+		{
+			pDC->SetTextColor(RGB(0, 0, 255));
+		}
+		if (strColor == L"绿色")
+		{
+			pDC->SetTextColor(RGB(0, 255, 0));
+		}
+	}
+	return hbr;
+}
+
+
+void CMFCChatServerDlg::OnBnClickedCalButton()
+{
+	//执行shell命令
+	// TODO: 在此添加控件通知处理程序代码
+	ShellExecute(NULL,L"open",L"calc.exe",NULL,NULL,SW_SHOWNORMAL);
+}
+
+
+void CMFCChatServerDlg::OnBnClickedMailButton()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	ShellExecute(NULL, L"open", L"http://mail.qq.com", NULL, NULL, SW_SHOWNORMAL);
+}
+
+
+void CMFCChatServerDlg::OnBnClickedQqButton()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	ShellExecute(NULL, L"open", _T("C:\\Program Files (x86)\\Tencent\\QQ\\Bin\\QQScLauncher.exe"),
+		NULL, NULL, SW_SHOWNORMAL);
+}
+
+
+void CMFCChatServerDlg::OnBnClickedBaiduButton()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	ShellExecute(NULL, L"open", L"http://baidu.com", NULL, NULL, SW_SHOWNORMAL);
 }

@@ -43,4 +43,10 @@ public:
 	afx_msg void OnBnClickedSentBtn();
 	CString CMFCCHatClicentDlg::CatShowString(CString strInfo,CString strMsg);
 	afx_msg void OnBnClickedSvaenameBin();
+	/*afx_msg void OnBnClickedAutosentRadio();*/
+	afx_msg void OnBnClickedClearmsgBtn();
+	afx_msg void OnBnClickedAutosentCheck();
+	CComboBox m_WordColoerCombo;
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

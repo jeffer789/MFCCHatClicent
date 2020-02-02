@@ -40,4 +40,12 @@ public:
 	//CTime m_tm;
 	afx_msg void OnBnClickedSentBtn();
 	CString CMFCChatServerDlg::CatShowString(CString strInfo, CString strMsg);
+	afx_msg void OnBnClickedClearmsgBtn();
+	afx_msg void OnBnClickedStopButton();
+	CComboBox m_WordColoerCombo;
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnBnClickedCalButton();
+	afx_msg void OnBnClickedMailButton();
+	afx_msg void OnBnClickedQqButton();
+	afx_msg void OnBnClickedBaiduButton();
 };
